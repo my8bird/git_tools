@@ -1,0 +1,3 @@
+#! /bin/sh
+
+git for-each-ref --sort=-committerdate --format="%(refname)" refs/heads/ | cut -f3,4 -d"/"

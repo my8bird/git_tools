@@ -1,0 +1,9 @@
+#! /bin/bash
+
+base_branch="master"
+work_branch=`git rev-parse --abbrev-ref HEAD`
+merge_point=`git merge-base $base_branch $work_branch`
+
+echo "$work_branch $merge_point"
+
+git rebase -i $merge_point
