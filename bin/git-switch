@@ -1,0 +1,22 @@
+#! /bin/bash
+
+# Find the list of all branches sorted by most recent commit
+branches=( $(git recent) )
+num_branches=$(( ${#branches[@]} - 1))
+
+# Show the list with easy to pick numbers
+for i in $(seq 0 $num_branches);
+do
+   echo " [$i] ${branches[$i]}"
+done
+
+# Ask the user which branch to switch to
+echo
+echo "Select a branch number:"
+read num
+
+# Switch the branch
+if [[ -1 -lt $num && $num -le $num_branches ]]; then
+    echo "Switching to ${branches[$num]}"
+    git checkout ${branches[$num]}
+fi

@@ -24,6 +24,18 @@ recent
 
 List all branches sorted by more recently changed.  I like this because it helps me find the most likly branches I want to switch to instead of just all available choices.
 
+switch
+------
+`git switch`
+```sh
+[0] some branch
+[1] another
+
+Select a branch number:
+```
+
+Allows switching branches more easily.  The idea is to use `recent` and present the list with a numbered list.  The user then simply selects which branch to switch to by number.  When not running in a `git` aware shell this saves having to copy and paste branch names to switch to them.
+
 consolidate
 -----------
 `git consolidate`
