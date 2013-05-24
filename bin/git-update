@@ -2,13 +2,14 @@
 
 # Stores the branch to rebase onto
 base_branch="master"
+# Grab the branch the user is currently on
+work_branch=`git rev-parse --abbrev-ref HEAD`
+
+echo "Rebasing Branch '$work_branch' onto '$base_branch'"
 
 # Sets wiether we do rebases interactivly or not.
 # - use "" or "-i" where "-i" enables reviewing the rebase
 review_rebase="-i"
-
-# Grab the branch the user is currently on
-work_branch=`git rev-parse --abbrev-ref HEAD`
 
 # -- Main
 # Ensure the rebase branch is up to date
@@ -20,6 +21,8 @@ git checkout $work_branch
 
 # Find the most recent commit shared by both branches.
 merge_point=`git merge-base $base_branch $work_branch`
+
+echo "Using merge point $merge_point"
 
 # Update the users branch to sit on top of the base branch
 # This command places all commits after merge point onto the HEAD of base
