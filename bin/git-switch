@@ -3,6 +3,11 @@
 # Find the list of all branches sorted by most recent commit
 branches=( $(git recent) )
 num_branches=$(( ${#branches[@]} - 1))
+max_branches=-1
+if [ $max_branches -gt -1 ] && [ $num_branches -gt $max_branches ]
+then
+   num_branches=$max_branches
+fi
 
 # Show the list with easy to pick numbers
 for i in $(seq 0 $num_branches);
