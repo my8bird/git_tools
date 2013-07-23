@@ -2,9 +2,9 @@
 
 function prog_exists {
     command -v $1 >/dev/null 2>&1 || {
-        echo >&2 "$1 is required.";
-        echo >&2 "";
-        echo >&2 "$2";
+        echo >&2 "$1 is required.
+
+$2";
         exit 1;
    }
 }
@@ -42,7 +42,7 @@ fi
 # this code block will need some love.
 set `git remote -v | sed -rn "s/origin\W*git\@github\.com:(.*)\/(.*)\.git.*\(push\)/\1 \2/pg"`
 gh_owner=$1
-gh_repo=$
+gh_repo=$2
 
 # XXX Here is where we could use a command line switch to provide an issue to
 #     promote instead.
@@ -58,10 +58,17 @@ if [[ -z `git show-ref $base_branch` ]]; then
     error "$base_branch does not exist";
 fi
 
-echo $cur_branch
-echo $base_branch
+compare=$(curl --silent https://api.github.com/repos/$gh_owner/$gh_repo/compare/$base_branch...$cur_branch)
 
-curl https://api.github.com/repos/$gh_owner/$gh_repo/compare/$base_branch...$cur_branch
+output=`echo "$compare" | underscore process "data.status+' '+data.ahead_by+' '+data.behind_by"`
+set ${output:1:${#output}-2};
+compare_status=$1;
+commits_ahead=$2;
+commits_behind=$3;
+echo "The pull will be ahead by $commits_ahead commit."; # XXX should this show more detail
+echo "Here are the commits:
+";
+echo $compare | underscore process "reduce(data.commits, function(memo, value) {return memo + value.commit.message +' '+value.commit.author.email + '\n';}, '');"
 
 #curl https://api.github.com/repos/$gh_owner/$gh_repo
 
