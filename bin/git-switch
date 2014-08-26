@@ -10,7 +10,7 @@ then
 fi
 
 # Show the list with easy to pick numbers
-for i in $(seq 0 $num_branches);
+for ((i=0; i<=$num_branches; i++))
 do
    echo " [$i] ${branches[$i]}"
 done
