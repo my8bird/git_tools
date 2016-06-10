@@ -1,0 +1,4 @@
+#! /bin/sh
+
+#C:/src/taccs/taccs/tools/migrate/aims_repos/manage.py downgrade postgresql://p5:p5,taccs@beanvm/aims_dev?sslmode=prefer $1
+C:/src/taccs/taccs/tools/migrate/aims_repos/manage.py downgrade postgresql://p5:p5,taccs@es4/aims?sslmode=prefer $1
