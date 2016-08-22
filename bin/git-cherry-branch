@@ -1,0 +1,30 @@
+#! /bin/bash
+
+show_help () {
+    echo "Usage:"
+    echo "  git cherry-branch BASE_BRANCH BRANCH_NAME"
+    echo
+    echo "Args:"
+    echo "  -h: Help"
+    exit 0
+}
+
+format="%H"
+
+while getopts "h?f?" flag; do
+    case "$flag" in
+        h|\?) show_help;;
+    esac
+done
+
+base=${@:$OPTIND:1}
+work=${@:$OPTIND+1:1}
+
+commits_str=`git branch-commits $base $work`
+commits=( $commits_str )
+
+for commit in "${commits[@]}"; do
+    echo
+    echo "** $commit ** "
+    git cherry-pick $commit
+done

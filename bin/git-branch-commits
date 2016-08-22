@@ -1,0 +1,28 @@
+#! /bin/bash
+
+show_help () {
+    echo "Usage:"
+    echo "  git branch-commits BASE_BRANCH BRANCH_NAME"
+    echo
+    echo "Args:"
+    echo "  -h: Help"
+    echo "  -f: log format https://git-scm.com/docs/git-log"
+    echo "      %ae: author email, %s: subject, %b: body"
+    exit 0
+}
+
+format="%H"
+
+while getopts "h?f?" flag; do
+    case "$flag" in
+        h|\?) show_help;;
+        f)    format=$OPTARG;;
+    esac
+done
+
+base=${@:$OPTIND:1}
+work=${@:$OPTIND+1:1}
+
+commits_str=`git log --no-merges $base..$work --pretty=format:"$format"`
+
+echo "$commits_str" | tac
