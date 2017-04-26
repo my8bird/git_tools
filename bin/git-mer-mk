@@ -1,0 +1,4 @@
+#! /bin/bash
+
+git refresh master
+git checkout -b branches/mer-$1

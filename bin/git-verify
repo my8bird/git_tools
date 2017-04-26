@@ -1,0 +1,15 @@
+#! /bin/bash
+
+cd ~/projects/mercury
+
+# run verify and capture output
+config/scripts/verify | tee verify.out
+
+if [ ${PIPESTATUS[0]} -ne "0" ];
+then
+    rm verify.out
+    exit ${PIPESTATUS[0]}
+else
+    # Look for slow tests
+    grep SLOW verify.out | awk '{print $5 ", " $3}' | tee ~/projects/slow_test/runs/$(date +"%Y%m%d_%H_%M_%S")
+fi

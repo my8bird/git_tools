@@ -1,0 +1,34 @@
+#! /bin/bash
+
+show_help () {
+    echo "Usage:"
+    echo "  git create-tester TICKET_1 TICKET_2 ..."
+    echo
+    echo "Args:"
+    echo "  -h: Help"
+    exit 0
+}
+
+format="%H"
+
+while getopts "h?f?" flag; do
+    case "$flag" in
+        h|\?) show_help;;
+    esac
+done
+
+git diff --exit-code || { echo "There are changes still pending"; exit 1; }
+git diff --cached --exit-code || { echo "There are staged changes"; exit 1; }
+
+git fetch
+git branch -D test
+git checkout -b test
+
+git reset --hard origin/master
+
+base="origin/master"
+
+for ticket in "$@"
+do
+    git cherry-branch $base origin/branches/mer-$ticket
+done

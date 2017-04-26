@@ -1,0 +1,10 @@
+#! /bin/bash
+
+base="origin/master"
+work=`git branch | grep \* | cut -d ' ' -f2`
+
+commits_str=`git branch-commits $base $work`
+commits=( $commits_str )
+oldest_commit="${commits[0]}"
+
+git rebase --onto origin/master -i $oldest_commit^
