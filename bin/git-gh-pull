@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+function prog_exists {
+    command -v $1 >/dev/null 2>&1 || {
+        echo >&2 "$1 is required.
+
+$2";
+        exit 1;
+   }
+}
+
+function error {
+    echo "ERROR: $1";
+    exit 1;
+}
+
+# Ensure we have the required programs
+prog_exists "curl";
+prog_exists "underscore" "Use: npm install underscore-cli -g";
+
+
+# Configuration
+# This script uses the gh.accesstoken value to communicate with the GitHub API
+# to set this value create an access token and then set it using git config.
+#
+# `git config gh.access_token ##########
+#
+# https://github.com/settings/applications under "Personal API Access Tokens"
+
+# XXX i might not need this as the ssh key seems to do it
+access_token=`git config --get gh.accesstoken`;
+
+if [ -z $access_token ]; then
+    error "You did not tell me how to authenticate with GitHub.
+Please set an access token for me to use then retry your command.
+
+git config gh.accesstoken  ####";
+fi
+
+# Determine the github repository to use
+# By convension `origin` is the GitHub remote host.  If that is not true then
+# this code block will need some love.
+set `git remote -v | sed -rn "s/origin\W*git\@github\.com:(.*)\/(.*)\.git.*\(push\)/\1 \2/pg"`
+gh_owner=$1
+gh_repo=$2
+
+# XXX Here is where we could use a command line switch to provide an issue to
+#     promote instead.
+
+
+# Create a pull request
+cur_branch=`git rev-parse --abbrev-ref HEAD`
+
+# - Ask the user what the base branch should be
+read -p "What branch should pull be created based on? " base_branch
+# - Make sure the branch actually exists
+if [[ -z `git show-ref $base_branch` ]]; then
+    error "$base_branch does not exist";
+fi
+
+compare=$(curl --silent https://api.github.com/repos/$gh_owner/$gh_repo/compare/$base_branch...$cur_branch)
+
+output=`echo "$compare" | underscore process "data.status+' '+data.ahead_by+' '+data.behind_by"`
+set ${output:1:${#output}-2};
+compare_status=$1;
+commits_ahead=$2;
+commits_behind=$3;
+echo "The pull will be ahead by $commits_ahead commit."; # XXX should this show more detail
+echo "Here are the commits:
+";
+echo $compare | underscore process "reduce(data.commits, function(memo, value) {return memo + value.commit.message +' '+value.commit.author.email + '\n';}, '');"
+
+#curl https://api.github.com/repos/$gh_owner/$gh_repo
+
+
+# Get some stuff
+# XXX
+# curl https://api.github.com/repos/$gh_owner/$gh_repo
